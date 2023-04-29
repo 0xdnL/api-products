@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"net/http"
+
+	log "github.com/sirupsen/logrus"
 )
 
 var (
@@ -10,6 +12,7 @@ var (
 )
 
 func handler(w http.ResponseWriter, r *http.Request) {
+	log.Info(r.RequestURI)
 	fmt.Fprintf(w, "hello world")
 }
 
