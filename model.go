@@ -3,6 +3,8 @@ package main
 import (
 	"database/sql"
 	"fmt"
+
+	log "github.com/sirupsen/logrus"
 )
 
 type product struct {
@@ -47,6 +49,25 @@ func (p *product) getProduct(db *sql.DB) error {
 	if err != nil {
 		return err
 	}
+
+	return nil
+}
+
+func (p *product) createProduct(db *sql.DB) error {
+
+	query := fmt.Sprintf("INSERT INTO products (name, quantity, price) values('%v', %v, %v)", p.Name, p.Quantity, p.Price)
+	log.Info("create: ", query)
+	result, err := db.Exec(query)
+	if err != nil {
+		return err
+	}
+
+	id, err := result.LastInsertId()
+	if err != nil {
+		return err
+	}
+
+	p.ID = int(id)
 
 	return nil
 }

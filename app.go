@@ -2,12 +2,12 @@ package main
 
 import (
 	"database/sql"
-	_ "database/sql"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"strconv"
 
+	_ "github.com/go-sql-driver/mysql" // use package for side-effect
 	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
 )
@@ -85,7 +85,28 @@ func (app *App) getProduct(w http.ResponseWriter, r *http.Request) {
 	sendResponse(w, http.StatusOK, p)
 }
 
+func (app *App) createProduct(w http.ResponseWriter, r *http.Request) {
+	var p product
+
+	err := json.NewDecoder(r.Body).Decode(&p)
+	if err != nil {
+		sendError(w, http.StatusBadRequest, "invalid request paylaod")
+		return
+	}
+
+	log.Info("creating: ", p)
+	err = p.createProduct(app.Db)
+	if err != nil {
+		sendError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	sendResponse(w, http.StatusOK, p)
+
+}
+
 func (app *App) handleRoutes() {
 	app.Router.HandleFunc("/products", app.getProducts).Methods("GET")
 	app.Router.HandleFunc("/product/{id}", app.getProduct).Methods("GET")
+	app.Router.HandleFunc("/product", app.createProduct).Methods("POST")
 }
