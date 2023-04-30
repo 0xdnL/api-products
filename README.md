@@ -29,4 +29,22 @@ DESC data;
 INSERT INTO data values(1, "abc");
 INSERT INTO data values(2, "def");
 INSERT INTO data values(3, "ghi");
+
+
+CREATE DATABASE IF NOT EXISTS inventory;
+USE inventory;
+CREATE TABLE products(
+  id INT NOT NULL AUTO_INCREMENT,
+  name varchar(255) NOT NULL,
+  quantity int,
+  price float(10,7),
+  PRIMARY KEY(id)
+  );
+INSERT INTO products values(1, "chair", 100, 200.00);
+INSERT INTO products values(2, "table", 150, 220.00);
+INSERT INTO products values(3, "lamp", 80, 50.00);
 ```
+
+## todo
+
+- try out ORM
