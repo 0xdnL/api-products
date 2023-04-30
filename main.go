@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -35,7 +36,8 @@ func getAllProducts(w http.ResponseWriter, r *http.Request) {
 func getProductById(w http.ResponseWriter, r *http.Request) {
 	log.Info("[getProductById] ", r.RequestURI)
 
-	key := r.URL.Path[len("/product/"):]
+	vars := mux.Vars(r)
+	key := vars["id"]
 
 	id, err := strconv.Atoi(key)
 	if err != nil {
@@ -50,10 +52,12 @@ func getProductById(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleReq() {
-	http.HandleFunc("/product/", getProductById)
-	http.HandleFunc("/products", getAllProducts)
-	http.HandleFunc("/", handler)
-	http.ListenAndServe(addr, nil)
+
+	router := mux.NewRouter().StrictSlash(true)
+	router.HandleFunc("/product/{id}", getProductById)
+	router.HandleFunc("/products", getAllProducts)
+	router.HandleFunc("/", handler)
+	http.ListenAndServe(addr, router)
 }
 
 func main() {
