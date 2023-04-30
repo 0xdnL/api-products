@@ -17,7 +17,7 @@ type App struct {
 	Db     *sql.DB
 }
 
-func (app *App) Init() error {
+func (app *App) Init(DbUser string, DbPass string, DbHost string, DbName string) error {
 
 	connectionString := fmt.Sprintf("%v:%v@tcp(%v)/%v", DbUser, DbPass, DbHost, DbName)
 
@@ -101,7 +101,7 @@ func (app *App) createProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	sendResponse(w, http.StatusOK, p)
+	sendResponse(w, http.StatusCreated, p)
 }
 
 func (app *App) updateProduct(w http.ResponseWriter, r *http.Request) {

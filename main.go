@@ -105,7 +105,7 @@ func main() {
 	app := App{}
 
 	log.Info("init..")
-	app.Init()
+	app.Init(DbUser, DbPass, DbHost, DbName)
 
 	log.Info("run on ", ServerAddr, "..")
 	app.Run(ServerAddr)

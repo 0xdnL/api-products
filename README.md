@@ -33,7 +33,7 @@ INSERT INTO data values(3, "ghi");
 
 CREATE DATABASE IF NOT EXISTS inventory;
 USE inventory;
-CREATE TABLE products(
+CREATE TABLE IF NOT EXISTS products(
   id INT NOT NULL AUTO_INCREMENT,
   name varchar(255) NOT NULL,
   quantity int,
