@@ -1,7 +1,9 @@
 package main
 
 import (
+	"bytes"
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -105,5 +107,30 @@ func sendRequest(request *http.Request) *httptest.ResponseRecorder {
 func checkStatusCode(t *testing.T, expectedStatusCode int, actualStatusCode int) {
 	if expectedStatusCode != actualStatusCode {
 		t.Errorf("Expected status: %v, Received status: %v", expectedStatusCode, actualStatusCode)
+	}
+}
+
+func TestCreateProduct(t *testing.T) {
+
+	clearTable()
+
+	var product = []byte(`{"name": "glass", "quantity": 1, "price": 100}`)
+
+	req, _ := http.NewRequest("POST", "/product", bytes.NewBuffer(product)) //@TODO: find out how does bytes.NewBuffer implement io.Reader ?
+	req.Header.Set("Content-Type", "application/json")
+	response := sendRequest(req)
+	checkStatusCode(t, http.StatusCreated, response.Code)
+
+	var m map[string]interface{}
+	json.Unmarshal(response.Body.Bytes(), &m)
+
+	// log.Println(m)
+	// log.Printf("%T", m["Quantity
+	if m["Name"] != "glass" {
+		t.Errorf("Expected Name: %v, Got: %v", "glass", m["Name"])
+	}
+
+	if m["Quantity"] != 1.0 {
+		t.Errorf("Expected Quantity: %v, Got: %v", 1.0, m["Quantity"])
 	}
 }
