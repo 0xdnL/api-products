@@ -52,9 +52,7 @@ func createDatabase() {
 		log.Fatal(err)
 	}
 
-	//                   "CREATE DATABASE IF NOT EXISTS inventory;"
 	query := fmt.Sprintf("CREATE DATABASE IF NOT EXISTS %v", testDbName)
-
 	_, err = db.Exec(query)
 
 	if err != nil {
@@ -91,6 +89,7 @@ func addProduct(name string, quanity int, price float64) {
 }
 
 func TestGetProduct(t *testing.T) {
+	clearTable()
 	createTable()
 	addProduct("keyboard", 100, 300)
 	req, _ := http.NewRequest("GET", "/product/1", nil)
@@ -133,4 +132,21 @@ func TestCreateProduct(t *testing.T) {
 	if m["Quantity"] != 1.0 {
 		t.Errorf("Expected Quantity: %v, Got: %v", 1.0, m["Quantity"])
 	}
+}
+
+func TestDeleteProduct(t *testing.T) {
+	clearTable()
+	addProduct("phone", 10, 20)
+
+	req, _ := http.NewRequest("GET", "/product/1", nil)
+	response := sendRequest(req)
+	checkStatusCode(t, http.StatusOK, response.Code)
+
+	req, _ = http.NewRequest("DELETE", "/product/1", nil)
+	response = sendRequest(req)
+	checkStatusCode(t, http.StatusOK, response.Code)
+
+	req, _ = http.NewRequest("GET", "/product/1", nil)
+	response = sendRequest(req)
+	checkStatusCode(t, http.StatusNotFound, response.Code)
 }
