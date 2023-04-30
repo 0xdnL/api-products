@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 
 	log "github.com/sirupsen/logrus"
@@ -55,7 +56,12 @@ func (p *product) getProduct(db *sql.DB) error {
 
 func (p *product) createProduct(db *sql.DB) error {
 
-	query := fmt.Sprintf("INSERT INTO products (name, quantity, price) values('%v', %v, %v)", p.Name, p.Quantity, p.Price)
+	query := fmt.Sprintf(
+		"INSERT INTO products (name, quantity, price) values('%v', %v, %v)",
+		p.Name,
+		p.Quantity,
+		p.Price,
+	)
 	log.Info("create: ", query)
 	result, err := db.Exec(query)
 	if err != nil {
@@ -70,4 +76,25 @@ func (p *product) createProduct(db *sql.DB) error {
 	p.ID = int(id)
 
 	return nil
+}
+
+func (p *product) updateProduct(db *sql.DB) error {
+
+	query := fmt.Sprintf(
+		"UPDATE products set name='%v', quantity='%v', price='%v' WHERE id=%v",
+		p.Name,
+		p.Quantity,
+		p.Price,
+		p.ID,
+	)
+	log.Info("udpate: ", query)
+	result, err := db.Exec(query)
+
+	rowsAffected, err := result.RowsAffected()
+
+	if rowsAffected == 0 {
+		return errors.New("nothing to update")
+	}
+
+	return err
 }
