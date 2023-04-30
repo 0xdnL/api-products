@@ -68,7 +68,6 @@ func (app *App) getProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Info("getting product: ", id)
 	p := product{ID: id}
 	err = p.getProduct(app.Db)
 
@@ -94,7 +93,6 @@ func (app *App) createProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Info("creating: ", p)
 	err = p.createProduct(app.Db)
 	if err != nil {
 		sendError(w, http.StatusInternalServerError, err.Error())

@@ -109,7 +109,7 @@ func checkStatusCode(t *testing.T, expectedStatusCode int, actualStatusCode int)
 	}
 }
 
-func TestCreateProduct(t *testing.T) {
+func TestCreateProductById(t *testing.T) {
 
 	clearTable()
 
@@ -124,7 +124,7 @@ func TestCreateProduct(t *testing.T) {
 	json.Unmarshal(response.Body.Bytes(), &m)
 
 	// log.Println(m)
-	// log.Printf("%T", m["Quantity
+	// log.Printf("%T", m["Quantity"])
 	if m["Name"] != "glass" {
 		t.Errorf("Expected Name: %v, Got: %v", "glass", m["Name"])
 	}
@@ -150,3 +150,52 @@ func TestDeleteProduct(t *testing.T) {
 	response = sendRequest(req)
 	checkStatusCode(t, http.StatusNotFound, response.Code)
 }
+
+func TestUpdateProductName(t *testing.T) {
+	clearTable()
+	addProduct("phone", 10, 20)
+
+	req, _ := http.NewRequest("GET", "/product/1", nil)
+	response := sendRequest(req)
+	checkStatusCode(t, http.StatusOK, response.Code)
+
+	var oldValue map[string]interface{}
+	json.Unmarshal(response.Body.Bytes(), &oldValue)
+
+	var product = []byte(`{"name": "banana", "quantity": 10, "price": 20}`)
+
+	req, _ = http.NewRequest("PUT", "/product/1", bytes.NewBuffer(product))
+	req.Header.Set("Content-Type", "application/json")
+	response = sendRequest(req)
+	checkStatusCode(t, http.StatusOK, response.Code)
+
+	var newValue map[string]interface{}
+	json.Unmarshal(response.Body.Bytes(), &newValue)
+
+	req, _ = http.NewRequest("GET", "/product/1", nil)
+	response = sendRequest(req)
+	checkStatusCode(t, http.StatusOK, response.Code)
+
+	log.Println(oldValue)
+	log.Println(newValue)
+
+	if oldValue["ID"] != newValue["ID"] {
+		t.Errorf("Expected ID: %v, Got: %v", oldValue["ID"], newValue["ID"])
+	}
+
+	if oldValue["Name"] == newValue["Name"] { // if value remains same, we fail
+		t.Errorf("Expected Name: %v, Got: %v", oldValue["Name"], newValue["Name"])
+	}
+
+	if oldValue["Quantity"] != newValue["Quantity"] {
+		t.Errorf("Expected quantity: %v, Got: %v", oldValue["Quantity"], newValue["Quantity"])
+	}
+
+	if oldValue["Price"] != newValue["Price"] {
+		t.Errorf("Expected price: %v, Got: %v", oldValue["Price"], newValue["Price"])
+	}
+}
+
+// @TODO: check for produkt that does not exist in db
+// @TODO: test get all products api call
+// @TODO: test posting wrong datatypes
