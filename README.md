@@ -48,3 +48,4 @@ INSERT INTO products values(3, "lamp", 80, 50.00);
 ## todo
 
 - try out ORM
+- add testcases
