@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -27,11 +28,29 @@ func handler(w http.ResponseWriter, r *http.Request) {
 }
 
 func getAllProducts(w http.ResponseWriter, r *http.Request) {
-	log.Info(r.RequestURI)
+	log.Info("[getAllProducts] ", r.RequestURI)
 	json.NewEncoder(w).Encode(Products)
 }
 
+func getProductById(w http.ResponseWriter, r *http.Request) {
+	log.Info("[getProductById] ", r.RequestURI)
+
+	key := r.URL.Path[len("/product/"):]
+
+	id, err := strconv.Atoi(key)
+	if err != nil {
+		panic(err)
+	}
+
+	for _, product := range Products {
+		if product.Id == id {
+			json.NewEncoder(w).Encode(product)
+		}
+	}
+}
+
 func handleReq() {
+	http.HandleFunc("/product/", getProductById)
 	http.HandleFunc("/products", getAllProducts)
 	http.HandleFunc("/", handler)
 	http.ListenAndServe(addr, nil)
