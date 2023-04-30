@@ -2,6 +2,7 @@ name: ci
 on: push
 
 env:
+  MYSQL_ROOT_PASSWORD: password
   DB_NAME: test
   DB_USER: root
   DB_PASS: toor
@@ -14,7 +15,8 @@ jobs:
         run: |
           # sudo apt-get update -y
           sudo /etc/init.d/mysql start
-          sudo mysql -e 'ALTER USER "${{env.DB_USER}}"@"localhost" IDENTIFIED BY "${{env.DB_PASS}}";' -u ${{env.DB_USER}} -proot
+          sudo systemctl status mysql.service
+          sudo mysql -e 'ALTER USER "${{env.DB_USER}}"@"localhost" IDENTIFIED BY "${{env.DB_PASS}}";' -u${{env.DB_USER}} -p ${{env.MYSQL_ROOT_PASSWORD}}
           sudo mysql -e 'CREATE DATABASE ${{env.DB_NAME}};' -u ${{env.DB_USER}} -p ${{env.DB_PASS}}
       - name: checkout repo
         uses: actions/checkout@v2
